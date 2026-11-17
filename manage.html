@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Student Hub | Student Management</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1d2939;
+      --muted: #667085;
+      --line: #e6eaf0;
+      --blue: #4169e1;
+      --blue-dark: #3156c7;
+      --surface: #fff;
+      --page: #f5f7fb;
+      --green: #157347;
+      --red: #b42318;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: var(--page); color: var(--ink); }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .app-shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 248px; flex: 0 0 248px; padding: 28px 18px; background: #18243a; color: #fff; }
+    .brand { display: flex; align-items: center; gap: 12px; margin: 0 8px 48px; font-size: 19px; font-weight: 750; letter-spacing: -.4px; }
+    .brand-mark { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 12px; background: #4268df; font-size: 19px; }
+    .nav-label { margin: 0 12px 12px; color: #9aa8bd; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 9px; color: #e6ebf4; font-size: 14px; }
+    .nav-item.active { background: #293954; color: #fff; }
+    .nav-icon { width: 19px; text-align: center; }
+    .sidebar-note { margin: 36px 10px 0; color: #9aa8bd; font-size: 12px; line-height: 1.6; }
+    main { width: min(1280px, 100%); margin: 0 auto; padding: 34px 42px 48px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 32px; }
+    .eyebrow { margin: 0 0 6px; color: var(--muted); font-size: 13px; }
+    h1 { margin: 0; font-size: clamp(24px, 3vw, 30px); letter-spacing: -.8px; }
+    .top-date { color: var(--muted); font-size: 13px; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 28px; }
+    .stat-card, .panel { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 2px 8px rgb(16 24 40 / 3%); }
+    .stat-card { display: flex; align-items: center; gap: 16px; padding: 21px 22px; }
+    .stat-icon { display: grid; width: 46px; height: 46px; flex: 0 0 46px; place-items: center; border-radius: 12px; background: #eef2ff; color: var(--blue); font-size: 20px; }
+    .stat-card:nth-child(2) .stat-icon { background: #eaf8f1; color: var(--green); }
+    .stat-card:nth-child(3) .stat-icon { background: #fff4e5; color: #b54708; }
+    .stat-label { margin: 0 0 5px; color: var(--muted); font-size: 12px; }
+    .stat-value { margin: 0; font-size: 23px; font-weight: 750; }
+    .panel { padding: 24px; }
+    .panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+    h2 { margin: 0 0 5px; font-size: 18px; letter-spacing: -.3px; }
+    .subheading { margin: 0; color: var(--muted); font-size: 13px; }
+    .toolbar { display: flex; align-items: center; gap: 10px; }
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; top: 50%; left: 12px; transform: translateY(-50%); color: #98a2b3; }
+    .search { width: 230px; padding-left: 36px; }
+    input, select { min-height: 40px; padding: 9px 11px; border: 1px solid #d0d5dd; border-radius: 8px; background: white; color: var(--ink); outline: none; }
+    input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgb(65 105 225 / 13%); }
+    .button { min-height: 40px; padding: 9px 14px; border: 1px solid transparent; border-radius: 8px; font-size: 13px; font-weight: 650; }
+    .button-primary { background: var(--blue); color: white; }
+    .button-primary:hover { background: var(--blue-dark); }
+    .button-quiet { border-color: var(--line); background: white; color: var(--ink); }
+    .button-quiet:hover { background: #f9fafb; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 12px 14px; border-bottom: 1px solid var(--line); color: #667085; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; white-space: nowrap; }
+    td { padding: 15px 14px; border-bottom: 1px solid #eef0f4; font-size: 13px; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .student-name { font-weight: 650; }
+    .student-id { margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .course-pill { display: inline-block; padding: 5px 9px; border-radius: 20px; background: #f0f3ff; color: #394e9e; font-size: 11px; white-space: nowrap; }
+    .actions { display: flex; gap: 6px; }
+    .icon-button { min-width: 34px; min-height: 34px; border: 1px solid var(--line); border-radius: 7px; background: white; color: #475467; }
+    .icon-button:hover { background: #f8f9fc; }
+    .icon-button.delete:hover { border-color: #fecdca; color: var(--red); }
+    .empty-state { padding: 42px 14px; color: var(--muted); text-align: center; }
+    .empty-state strong { display: block; margin-bottom: 6px; color: var(--ink); font-size: 15px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+    dialog { width: min(460px, calc(100% - 28px)); padding: 0; border: 0; border-radius: 14px; box-shadow: 0 20px 60px rgb(16 24 40 / 25%); }
+    dialog::backdrop { background: rgb(16 24 40 / 48%); }
+    .dialog-content { padding: 24px; }
+    .dialog-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; }
+    .dialog-close { border: 0; background: none; color: var(--muted); font-size: 22px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .field { display: grid; gap: 7px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { color: #344054; font-size: 12px; font-weight: 650; }
+    .field input, .field select { width: 100%; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 24px; }
+    .notice { min-height: 18px; margin: 12px 0 0; color: var(--red); font-size: 12px; }
+    @media (max-width: 900px) {
+      .sidebar { width: 205px; flex-basis: 205px; }
+      main { padding: 30px 24px; }
+      .stats { gap: 12px; }
+      .stat-card { padding: 17px 15px; }
+      .stat-icon { width: 40px; height: 40px; flex-basis: 40px; }
+    }
+    @media (max-width: 680px) {
+      .sidebar { display: none; }
+      main { padding: 24px 16px 36px; }
+      .topbar { align-items: flex-start; margin-bottom: 24px; }
+      .top-date { display: none; }
+      .stats { grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
+      .stat-card { padding: 14px 16px; }
+      .stat-value { font-size: 20px; }
+      .panel { padding: 18px 14px; }
+      .panel-heading { flex-direction: column; }
+      .toolbar, .search-wrap, .search { width: 100%; }
+      .toolbar .button { white-space: nowrap; }
+      th, td { padding: 12px 10px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">S</span> Student Hub</div>
+      <p class="nav-label">Workspace</p>
+      <div class="nav-item active" aria-current="page"><span class="nav-icon" aria-hidden="true">▦</span> Students</div>
+      <p class="sidebar-note">Keep student records organized in one simple place.</p>
+    </aside>
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Workspace / Students</p>
+          <h1>Student management</h1>
+        </div>
+        <time class="top-date" id="today"></time>
+      </header>
+
+      <section class="stats" aria-label="Student summary">
+        <article class="stat-card">
+          <span class="stat-icon" aria-hidden="true">♙</span>
+          <div><p class="stat-label">Total students</p><p class="stat-value" id="total-count">0</p></div>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon" aria-hidden="true">✓</span>
+          <div><p class="stat-label">Active students</p><p class="stat-value" id="active-count">0</p></div>
+        </article>
+        <article class="stat-card">
+          <span class="stat-icon" aria-hidden="true">▤</span>
+          <div><p class="stat-label">Courses represented</p><p class="stat-value" id="course-count">0</p></div>
+        </article>
+      </section>
+
+      <section class="panel" aria-labelledby="student-list-heading">
+        <div class="panel-heading">
+          <div>
+            <h2 id="student-list-heading">All students</h2>
+            <p class="subheading">View, add, and manage student records.</p>
+          </div>
+          <div class="toolbar">
+            <label class="search-wrap">
+              <span class="search-icon" aria-hidden="true">⌕</span>
+              <span class="sr-only">Search students</span>
+              <input class="search" id="search" type="search" placeholder="Search students..." autocomplete="off">
+            </label>
+            <button class="button button-primary" id="add-student" type="button">＋ Add student</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th scope="col">Student</th><th scope="col">Email</th><th scope="col">Course</th><th scope="col">Year</th><th scope="col">Actions</th></tr>
+            </thead>
+            <tbody id="student-rows"></tbody>
+          </table>
+          <div class="empty-state" id="empty-state" hidden><strong>No students found</strong><span>Try another search or add a new student record.</span></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="student-dialog" aria-labelledby="dialog-title">
+    <form id="student-form" class="dialog-content">
+      <div class="dialog-header">
+        <div><h2 id="dialog-title">Add student</h2><p class="subheading">Enter the student's details below.</p></div>
+        <button class="dialog-close" id="close-dialog" type="button" aria-label="Close dialog">×</button>
+      </div>
+      <input id="student-key" type="hidden">
+      <div class="form-grid">
+        <div class="field full"><label for="name">Full name</label><input id="name" name="name" required maxlength="80" autocomplete="name"></div>
+        <div class="field full"><label for="email">Email address</label><input id="email" name="email" type="email" required maxlength="120" autocomplete="email"></div>
+        <div class="field"><label for="course">Course</label>
+          <select id="course" name="course" required>
+            <option value="">Select a course</option><option>Computer Science</option><option>Business</option><option>Engineering</option><option>Mathematics</option><option>Psychology</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field"><label for="year">Year</label>
+          <select id="year" name="year" required>
+            <option value="">Select year</option><option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option><option>Postgraduate</option>
+          </select>
+        </div>
+      </div>
+      <p class="notice" id="form-notice" role="alert"></p>
+      <div class="dialog-actions">
+        <button class="button button-quiet" id="cancel-dialog" type="button">Cancel</button>
+        <button class="button button-primary" id="save-student" type="submit">Add student</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var storageKey = "student-hub-records";
+      var starters = [
+        { id: "STU-1001", name: "Olivia Chen", email: "olivia.chen@example.edu", course: "Computer Science", year: "Year 2" },
+        { id: "STU-1002", name: "Noah Williams", email: "noah.williams@example.edu", course: "Business", year: "Year 1" },
+        { id: "STU-1003", name: "Amara Okafor", email: "amara.okafor@example.edu", course: "Engineering", year: "Year 3" },
+        { id: "STU-1004", name: "Ethan Patel", email: "ethan.patel@example.edu", course: "Mathematics", year: "Year 2" }
+      ];
+      var rows = document.getElementById("student-rows");
+      var search = document.getElementById("search");
+      var dialog = document.getElementById("student-dialog");
+      var form = document.getElementById("student-form");
+      var notice = document.getElementById("form-notice");
+      var students = loadStudents();
+
+      function loadStudents() {
+        try {
+          var saved = window.localStorage.getItem(storageKey);
+          if (saved === null) return starters.slice();
+          var parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.every(function (student) {
+            return student && typeof student.id === "string" && typeof student.name === "string" &&
+              typeof student.email === "string" && typeof student.course === "string" && typeof student.year === "string";
+          })) return parsed;
+          throw new Error("Saved student data has an invalid format.");
+        } catch (error) {
+          console.error("Could not load student records.", error);
+          return starters.slice();
+        }
+      }
+
+      function saveStudents() {
+        try {
+          window.localStorage.setItem(storageKey, JSON.stringify(students));
+          return true;
+        } catch (error) {
+          console.error("Could not save student records.", error);
+          notice.textContent = "Changes could not be saved in this browser. Check storage availability and try again.";
+          return false;
+        }
+      }
+
+      function makeCell(text) {
+        var cell = document.createElement("td");
+        cell.textContent = text;
+        return cell;
+      }
+
+      function render() {
+        var query = search.value.trim().toLocaleLowerCase();
+        var visible = students.filter(function (student) {
+          return [student.id, student.name, student.email, student.course, student.year].some(function (value) {
+            return value.toLocaleLowerCase().indexOf(query) !== -1;
+          });
+        });
+        rows.replaceChildren();
+        visible.forEach(function (student) {
+          var row = document.createElement("tr");
+          var identity = document.createElement("td");
+          var name = document.createElement("div");
+          var id = document.createElement("div");
+          name.className = "student-name";
+          name.textContent = student.name;
+          id.className = "student-id";
+          id.textContent = student.id;
+          identity.append(name, id);
+          row.append(identity, makeCell(student.email));
+          var courseCell = document.createElement("td");
+          var pill = document.createElement("span");
+          pill.className = "course-pill";
+          pill.textContent = student.course;
+          courseCell.append(pill);
+          row.append(courseCell, makeCell(student.year));
+          var actions = document.createElement("td");
+          var actionGroup = document.createElement("div");
+          actionGroup.className = "actions";
+          var edit = document.createElement("button");
+          edit.className = "icon-button";
+          edit.type = "button";
+          edit.textContent = "✎";
+          edit.setAttribute("aria-label", "Edit " + student.name);
+          edit.addEventListener("click", function () { openEdit(student.id); });
+          var remove = document.createElement("button");
+          remove.className = "icon-button delete";
+          remove.type = "button";
+          remove.textContent = "×";
+          remove.setAttribute("aria-label", "Delete " + student.name);
+          remove.addEventListener("click", function () { removeStudent(student.id); });
+          actionGroup.append(edit, remove);
+          actions.append(actionGroup);
+          row.append(actions);
+          rows.append(row);
+        });
+        document.getElementById("empty-state").hidden = visible.length > 0;
+        document.getElementById("total-count").textContent = String(students.length);
+        document.getElementById("active-count").textContent = String(students.length);
+        document.getElementById("course-count").textContent = String(new Set(students.map(function (student) { return student.course; })).size);
+      }
+
+      function openAdd() {
+        form.reset();
+        document.getElementById("student-key").value = "";
+        document.getElementById("dialog-title").textContent = "Add student";
+        document.getElementById("save-student").textContent = "Add student";
+        notice.textContent = "";
+        dialog.showModal();
+        document.getElementById("name").focus();
+      }
+
+      function openEdit(id) {
+        var student = students.find(function (item) { return item.id === id; });
+        if (!student) return;
+        document.getElementById("student-key").value = student.id;
+        document.getElementById("name").value = student.name;
+        document.getElementById("email").value = student.email;
+        document.getElementById("course").value = student.course;
+        document.getElementById("year").value = student.year;
+        document.getElementById("dialog-title").textContent = "Edit student";
+        document.getElementById("save-student").textContent = "Save changes";
+        notice.textContent = "";
+        dialog.showModal();
+        document.getElementById("name").focus();
+      }
+
+      function removeStudent(id) {
+        var student = students.find(function (item) { return item.id === id; });
+        if (!student || !window.confirm("Remove " + student.name + " from the student list?")) return;
+        var previous = students;
+        students = students.filter(function (item) { return item.id !== id; });
+        if (!saveStudents()) {
+          students = previous;
+          return;
+        }
+        render();
+      }
+
+      document.getElementById("add-student").addEventListener("click", openAdd);
+      document.getElementById("close-dialog").addEventListener("click", function () { dialog.close(); });
+      document.getElementById("cancel-dialog").addEventListener("click", function () { dialog.close(); });
+      search.addEventListener("input", render);
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        var id = document.getElementById("student-key").value;
+        var student = {
+          id: id || "STU-" + String(Date.now()).slice(-8),
+          name: document.getElementById("name").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          course: document.getElementById("course").value,
+          year: document.getElementById("year").value
+        };
+        var previous = students;
+        if (id) {
+          students = students.map(function (item) { return item.id === id ? student : item; });
+        } else {
+          students = [student].concat(students);
+        }
+        if (!saveStudents()) {
+          students = previous;
+          return;
+        }
+        dialog.close();
+        render();
+      });
+
+      document.getElementById("today").textContent = new Intl.DateTimeFormat(undefined, {
+        weekday: "short", year: "numeric", month: "short", day: "numeric"
+      }).format(new Date());
+      render();
+    }());
+  </script>
+</body>
+</html>
