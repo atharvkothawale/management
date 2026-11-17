@@ -10,7 +10,7 @@ Open `manage.html` in a modern browser. No server, package installation, or data
 
 1. Push this repository to GitHub and create a Jenkins **Pipeline** job.
 2. In the job configuration, select **Pipeline script from SCM**, choose **Git**, enter this repository's URL and credentials if it is private, and set the script path to `Jenkinsfile`.
-3. Ensure the Jenkins Git and Pipeline plugins are installed and that Jenkins is reachable by GitHub.
+3. Ensure the Jenkins Git, Pipeline, and GitHub plugins are installed and that Jenkins is reachable by GitHub.
 4. In GitHub, open **Settings → Webhooks → Add webhook**. Set the payload URL to `https://<your-jenkins-host>/github-webhook/`, content type to `application/json`, and choose **Just the push event**.
 5. Save the webhook and run the Jenkins job once to verify checkout and build.
 
